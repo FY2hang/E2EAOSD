@@ -1,4 +1,0 @@
-# ninja log v5
-0	2749	1749384699884437895	/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/build/temp.linux-x86_64-3.10/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/src/cpu/dscn_cpu.o	725aba7a1d396735
-1	8221	1749384705358462624	/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/build/temp.linux-x86_64-3.10/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/src/vision.o	b69f4bf81be2e547
-1	27560	1749384724691557732	/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/build/temp.linux-x86_64-3.10/home/hjj/Desktop/project/DEIM/compile_module/ops_dscn/src/cuda/dscn_cuda.o	f3831c4b3eea56df

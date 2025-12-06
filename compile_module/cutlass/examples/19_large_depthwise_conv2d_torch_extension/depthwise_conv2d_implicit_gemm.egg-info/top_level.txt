@@ -1,2 +1,0 @@
-_depthwise_conv2d_implicit_gemm_C
-depthwise_conv2d_implicit_gemm
