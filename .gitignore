@@ -1,0 +1,15 @@
+__pycache__/
+*.pth
+*.pt
+*.pkl
+.ipynb_checkpoints/
+.idea/
+.vscode/
+# 下面是这次新增的忽略项
+outputs/
+inference_results/
+heatmap_result_*/
+visual_box/
+data/
+dataset/
+venv/

@@ -1,0 +1,54 @@
+__include__: [
+  '/home/featurize/zfy/DEIM/configs/dataset/visdrone_detection.yml',
+  '../dfine/dfine_hgnetv2_n_visdrone.yml',
+  '../base/deim.yml'
+  # '../dfine/dfine_hgnetv2_n_custom.yml',
+  # '../dataset/custom_detection.yml',
+  # '../base/deim.yml'
+]
+
+print_freq: 2000
+output_dir: ./outputs/deim_hgnetv2_n_visdrone
+
+model: DEIM_MG
+
+DEIM_MG:
+  yaml_path: configs/cfg/dfine-n.yaml
+
+optimizer:
+  type: AdamW
+  params:
+    -
+      params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 0.0004
+    -
+      params: '^(?=.*backbone)(?=.*norm|bn).*$'
+      lr: 0.0004
+      weight_decay: 0.
+    -
+      params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$'
+      weight_decay: 0.
+
+  lr: 0.0002
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+
+# Increase to search for the optimal ema
+epoches: 300 # 148 + 12 278 + 22
+
+## Our LR-Scheduler
+flat_epoch: 154    # 4 + epoch // 2, e.g., 40 = 4 + 72 / 2
+no_aug_epoch: 22
+lr_gamma: 1.0
+
+## Our DataAug
+train_dataloader: 
+  dataset: 
+    transforms:
+      policy:
+        epoch: [4, 154, 278]   # list 
+
+  collate_fn:
+    mixup_epochs: [4, 154]
+    stop_epoch: 278
+    base_size_repeat: ~

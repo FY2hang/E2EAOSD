@@ -1,0 +1,62 @@
+__include__: [
+  '/home/featurize/zfy/DEIM/configs/dataset/aitod_detection.yml',
+  # '/home/featurize/zfy/DEIM/configs/dataset/aitod_detection2.yml',
+  '../runtime.yml',
+  '../base/dataloader_dfine.yml',
+  '../base/optimizer.yml',
+  '../base/dfine_hgnetv2.yml',
+]
+
+print_freq: 2000
+output_dir: ./outputs/dfine_hgnetv2_n_aitod_mg
+
+train_dataloader:
+  total_batch_size: 2 # total batch size equals to 32 (4 * 8)
+  # num_workers: 0
+val_dataloader:
+  total_batch_size: 2
+  # num_workers: 0
+
+remap_mscoco_category: False
+
+model: DEIM_MG
+
+DEIM_MG:
+  yaml_path: configs/cfg/dfine-n.yaml
+
+optimizer:
+  type: AdamW
+  params:
+    -
+      params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 0.0004
+    -
+      params: '^(?=.*backbone)(?=.*norm|bn).*$'
+      lr: 0.0004
+      weight_decay: 0.
+    -
+      params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$'
+      weight_decay: 0.
+
+  lr: 0.0002
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+
+# DEIMCriterion:
+#   no_weight_vfl_epoch: 30
+
+# Increase to search for the optimal ema
+epoches: 300 # 148 + 4n
+train_dataloader:
+  total_batch_size: 2
+  dataset:
+    transforms:
+      policy:
+        epoch: 278
+  collate_fn:
+    stop_epoch: 278
+    ema_restart_decay: 0.9999
+    base_size_repeat: ~
+
+val_dataloader:
+  total_batch_size: 2

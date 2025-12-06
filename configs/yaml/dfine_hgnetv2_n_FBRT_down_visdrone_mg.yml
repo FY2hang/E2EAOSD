@@ -1,0 +1,81 @@
+__include__: [
+  '/home/featurize/zfy/DEIM/configs/dataset/visdrone_detection.yml',
+  '../runtime.yml',
+  '../base/dataloader_dfine.yml',
+  '../base/optimizer.yml',
+  '../base/dfine_hgnetv2.yml',
+]
+
+print_freq: 400
+output_dir: ./outputs/dfine_hgnetv2_n_FBRT_down_visdrone_mg
+
+train_dataloader:
+  total_batch_size: 4 # total batch size equals to 32 (4 * 8)
+  # num_workers: 0
+val_dataloader:
+  total_batch_size: 4
+  # num_workers: 0
+
+remap_mscoco_category: True
+
+model: DEIM_MG
+
+DEIM_MG:
+  yaml_path: /home/featurize/zfy/DEIM/configs/cfg-improve/dfine-n-FBRT-down.yaml
+
+optimizer:
+  type: AdamW
+  params:
+    -
+      params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 0.0004
+    -
+      params: '^(?=.*backbone)(?=.*norm|bn).*$'
+      lr: 0.0004
+      weight_decay: 0.
+    -
+      params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$'
+      weight_decay: 0.
+
+  lr: 0.0002
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+
+# epoch:7->8 ap:0.0362->0.0396  0.0001
+# Increase to search for the optimal ema
+epoches: 300 # 148 + 4n
+train_dataloader:
+  total_batch_size: 4
+  dataset:
+    transforms:
+      policy:
+        epoch: 278
+  collate_fn:
+    stop_epoch: 278
+    ema_restart_decay: 0.9999
+    base_size_repeat: ~
+
+val_dataloader:
+  total_batch_size: 4
+
+
+
+# 1. 在当前session中设置环境变量
+# export TENSORRT_ROOT=/home/featurize/zfy/TensorRT-10.13.3.9
+# export LD_LIBRARY_PATH=$TENSORRT_ROOT/lib:$LD_LIBRARY_PATH
+# export PATH=$TENSORRT_ROOT/bin:$PATH
+# export PYTHONPATH=$TENSORRT_ROOT/python:$PYTHONPATH
+# 2. 验证环境变量
+# echo $LD_LIBRARY_PATH
+# echo $TENSORRT_ROOT
+# 3. 测试TensorRT导入
+# bashpython -c "import tensorrt as trt; print('TensorRT version:', trt.__version__)"
+# 4. 永久解决方案：添加到conda环境
+# 为了确保每次激活deim环境时都有这些变量，创建激活脚本：
+# mkdir -p $CONDA_PREFIX/etc/conda/activate.d
+# echo 'export TENSORRT_ROOT=/home/featurize/zfy/TensorRT-10.13.3.9' > $CONDA_PREFIX/etc/conda/activate.d/tensorrt.sh
+# echo 'export LD_LIBRARY_PATH=$TENSORRT_ROOT/lib:$LD_LIBRARY_PATH' >> $CONDA_PREFIX/etc/conda/activate.d/tensorrt.sh
+# echo 'export PATH=$TENSORRT_ROOT/bin:$PATH' >> $CONDA_PREFIX/etc/conda/activate.d/tensorrt.sh
+# echo 'export PYTHONPATH=$TENSORRT_ROOT/python:$PYTHONPATH' >> $CONDA_PREFIX/etc/conda/activate.d/tensorrt.sh
+# 5. 如果步骤3成功，运行export.py
+# bashpython export.py --resume /home/featurize/zfy/DEIM/outputs/dfine_hgnetv2_s_rr_visdrone_m

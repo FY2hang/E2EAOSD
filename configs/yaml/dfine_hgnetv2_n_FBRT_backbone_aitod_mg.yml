@@ -1,0 +1,76 @@
+__include__: [
+  '/home/featurize/zfy/DEIM/configs/dataset/aitod_detection.yml',
+  '../runtime.yml',
+  '../base/dataloader_dfine.yml',
+  '../base/optimizer.yml',
+  '../base/dfine_hgnetv2.yml',
+]
+
+print_freq: 2000
+# output_dir: ./outputs/dfine_hgnetv2_n_FBRT_backbone_visdrone_mg
+# output_dir: ./outputs/dfine_hgnetv2_n_FBRT_backbone_biformer_visdrone_mg
+output_dir: ./outputs/dfine_hgnetv2_n_FBRT_backbone_DPB_down_aitod_mg
+
+train_dataloader:
+  total_batch_size: 2 # total batch size equals to 32 (4 * 8)
+  # num_workers: 0
+val_dataloader:
+  total_batch_size: 2
+  # num_workers: 0
+
+remap_mscoco_category: False
+
+model: DEIM_MG
+
+DEIM_MG:
+  # yaml_path: /home/featurize/zfy/DEIM/configs/cfg-improve/dfine-n-FBRT-backbone.yaml
+  # yaml_path: /home/featurize/zfy/DEIM/configs/cfg-improve/dfine-n-FBRT-backbone-mmasa.yaml #add improved transformer
+  yaml_path: /home/featurize/zfy/DEIM/configs/cfg-improve/dfine-n-FBRT-backbone-mmasa-down.yaml #add improved down
+
+optimizer:
+  type: AdamW
+  params:
+    -
+      params: '^(?=.*backbone)(?!.*norm|bn).*$'
+      lr: 0.0004
+    -
+      params: '^(?=.*backbone)(?=.*norm|bn).*$'
+      lr: 0.0004
+      weight_decay: 0.
+    -
+      params: '^(?=.*(?:encoder|decoder))(?=.*(?:norm|bn|bias)).*$'
+      weight_decay: 0.
+
+  lr: 0.0002
+  betas: [0.9, 0.999]
+  weight_decay: 0.0001
+
+DEIMCriterion:
+    no_weight_vfl_epoch: 30
+
+# epoch:7->8 ap:0.0362->0.0396  0.0001
+# Increase to search for the optimal ema
+epoches: 300 # 148 + 4n
+train_dataloader:
+  total_batch_size: 2
+  dataset:
+    transforms:
+      ops:
+          - {type: RandomPhotometricDistort, p: 0.5}
+          # - {type: RandomZoomOut, fill: 0}
+          # - {type: RandomIoUCrop, p: 0.8}
+          - {type: SanitizeBoundingBoxes, min_size: 1}
+          - {type: RandomHorizontalFlip}
+          - {type: Resize, size: [640, 640], }
+          - {type: SanitizeBoundingBoxes, min_size: 1}
+          - {type: ConvertPILImage, dtype: 'float32', scale: True}
+          - {type: ConvertBoxes, fmt: 'cxcywh', normalize: True}
+      policy:
+        epoch: 278
+  collate_fn:
+    stop_epoch: 278
+    ema_restart_decay: 0.9999
+    base_size_repeat: ~
+
+val_dataloader:
+  total_batch_size: 2
