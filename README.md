@@ -36,7 +36,6 @@ VisDrone2019/
       ├── images/
       └── classes.txt
 
-```text
 ## Train and Test
 
 # syntax: CUDA_VISIBLE_DEVICES=<gpu_id> python train.py -c <yml_path> --seed=0
