@@ -2,7 +2,6 @@
 
 ## Installation 
 
-
 conda create -n torch_2_3_0_py310 python=3.10 anaconda
 
 # Check existing environments 
@@ -22,7 +21,6 @@ python check_torch_gpu.py
 
 Please organize the **VisDrone2019** dataset as follows:
 
-```text
 VisDrone2019/
   ├── VisDrone2019-DET-train/
   │   ├── annotations/
