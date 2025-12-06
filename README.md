@@ -17,6 +17,7 @@ pip install -r requirements.txt -i [https://pypi.tuna.tsinghua.edu.cn/simple](ht
 # Check if Torch and GPU are successfully loaded 
 python check_torch_gpu.py
 
+```text
 ## Dataset Preparation 
 
 Please organize the **VisDrone2019** dataset as follows:
@@ -35,6 +36,7 @@ VisDrone2019/
       ├── images/
       └── classes.txt
 
+```text
 ## Train and Test
 
 # syntax: CUDA_VISIBLE_DEVICES=<gpu_id> python train.py -c <yml_path> --seed=0
