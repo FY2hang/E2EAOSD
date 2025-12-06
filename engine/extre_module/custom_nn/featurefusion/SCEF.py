@@ -1,8 +1,3 @@
-'''    
-本文件由BiliBili：魔傀面具整理   
-engine/extre_module/module_images/INFFUS2025-DPCF.md engine/extre_module/module_images/INFFUS2025-DPCF.png 
-论文链接：https://arxiv.org/pdf/2505.23214  
-'''   
 
 import os, sys      
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../../../..')      
